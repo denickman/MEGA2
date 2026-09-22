@@ -1,0 +1,7 @@
+temperatures
+5
+7
+1
+4
+3
+3
