@@ -5,6 +5,18 @@ from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker, declarative_base
 
+
+
+# alembic installation
+# https://www.udemy.com/course/fastapi-the-complete-course/learn/lecture/39925406#overview
+# alembic init folder_name
+# alembic revision -m message
+# alembic upgrade revision
+# alembic downgrade -1
+# how to work with alembic
+# https://www.udemy.com/course/fastapi-the-complete-course/learn/lecture/39925424#overview
+
+
 """
 Swagger UI (браузер)
    │  HTTP POST /auth/auth + JSON
@@ -23,14 +35,18 @@ PostgreSQL → записывает на диск
 
 
 # for local db
-# SQLALCHEMY_DATABASE_URI = 'sqlite:///./todosapp.db'
-# engine = create_engine(SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False})
+SQLALCHEMY_DATABASE_URI = 'sqlite:///./todosapp.db'
+engine = create_engine(SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False})
 
 
 # need install pip install "psycopg[binary]"
 # for postgresql
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:qwerty123!@localhost/TodoAppDatabase'
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+# SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:qwerty123!@localhost/TodoAppDatabase'
+# engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+
+# mysql - open site - developer zone - mysql downloads - mysql community server - your os
+# after installation go to system preferecnes on your mac - see mysql icon
+# browser - mysql workbench for mac - download - after installing - open it
 
 
 
