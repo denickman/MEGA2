@@ -1,4 +1,4 @@
-from Repeat.game.enemy import *
+from Misc.Repeat.game.enemy import *
 
 enemy = Enemy()
 enemy.type_of_enemy = 'zombie'

@@ -5,9 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-import models
-
-
+# Импорт моделей — путь изменился после рефакторинга
+from app import models
 
 
 # this is the Alembic Config object, which provides

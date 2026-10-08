@@ -1,7 +1,7 @@
 """create phone number for user column
 
 Revision ID: 064d9e1974bc
-Revises: 
+Revises:
 Create Date: 2026-10-08 13:17:26.216769
 
 """
