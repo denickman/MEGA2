@@ -1,51 +1,7 @@
-from urllib import response
-
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import status
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from database import Base, get_db
+from .conftest import client, TestingSessionLocal
 from models import Todos
-from main import app
-from routers.auth import get_current_user
-
-SQLALCHEMY_DATABASE_URI = "sqlite:///./test.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URI,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-def override_get_current_user():
-    return {
-        'username': 'admin',
-        'user_id': 1,
-        'user_role': 'admin',
-    }
-
-
-app.dependency_overrides[get_db] = override_get_db
-app.dependency_overrides[get_current_user] = override_get_current_user
-
-client = TestClient(app)
-
 
 """"
 test_todo (фикстура)
@@ -68,31 +24,6 @@ assert сравнивает с ожидаемым результатом
 фикстура чистит таблицу
 """
 
-@pytest.fixture
-def test_todo():
-    # очистка перед тестом
-    with engine.connect() as conn:
-        conn.execute(text('DELETE FROM todos;'))
-        conn.commit()
-
-    todo = Todos(
-        title='learn the code',
-        description='learn the description',
-        priority=5,
-        completed=False,
-        owner_id=1,
-    )
-
-    db = TestingSessionLocal()
-    db.add(todo)
-    db.commit()
-    db.refresh(todo)
-    yield todo
-
-    # очистка после теста
-    with engine.connect() as conn:
-        conn.execute(text('DELETE FROM todos;'))
-        conn.commit()
 
 def test_read_all_authenticated(test_todo):
     response = client.get("/")
@@ -193,5 +124,5 @@ def test_delete_todo(test_todo):
 def test_delete_todo_not_found():
     response = client.delete('/todos/999')
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    
+
 
