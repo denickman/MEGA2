@@ -3,6 +3,7 @@ from fastapi import status
 from .conftest import client, TestingSessionLocal
 from models import Todos
 
+
 """"
 test_todo (фикстура)
     ↓

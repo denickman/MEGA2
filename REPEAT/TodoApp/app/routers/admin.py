@@ -17,15 +17,11 @@ router = APIRouter(
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
+
 @router.get("/todo", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency, db: db_dependency):
-    # FIX: было user.get("id") != 'admin' — неправильный ключ!
-    # get_current_user возвращает dict с ключом "user_role", а не "id" и не "role"
-    if user is None or user.get("user_role") != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized. Admin access required.",
-        )
+    if user is None or user.get("role") != "admin":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
     return db.query(Todos).all()
 
 
@@ -33,7 +29,7 @@ async def read_all(user: user_dependency, db: db_dependency):
 async def delete(db: db_dependency, user: user_dependency, todo_id: int = Path(gt=0)):
     # FIX: было user.get("role") — неправильный ключ!
     # Правильно: user.get("user_role")
-    if user is None or user.get("user_role") != "admin":
+    if user is None or user.get("role") != "admin":
         raise HTTPException(status_code=401, detail="Not authorized. Admin access required.")
 
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()

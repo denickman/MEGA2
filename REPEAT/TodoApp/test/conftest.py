@@ -33,9 +33,8 @@ def override_get_current_user():
     return {
         'username': 'admin',
         'user_id': 1,
-        'user_role': 'admin',
+        'role': 'admin',
     }
-
 
 app.dependency_overrides[get_db] = override_get_db
 app.dependency_overrides[get_current_user] = override_get_current_user
