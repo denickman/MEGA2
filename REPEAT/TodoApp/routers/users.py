@@ -36,7 +36,7 @@ async def index(user: user_dependency, db: db_dependency):
     return db.query(Users).filter(Users.id == user.get("user_id")).first()
 
 
-@router.put('/', status_code=status.HTTP_204_NO_CONTENT)
+@router.put('/change_password', status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(user: user_dependency, db: db_dependency, user_verification: UserVerification):
     if user is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -50,7 +50,7 @@ async def change_password(user: user_dependency, db: db_dependency, user_verific
     db.add(user_model)
     db.commit()
 
-@router.put('/phone_number/{phone_number}', status_code=status.HTTP_201_CREATED)
+@router.put('/phone_number/{phone_number}', status_code=status.HTTP_204_NO_CONTENT)
 async def change_phone_number(user: user_dependency, db: db_dependency, phone_number: str):
     if user is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
