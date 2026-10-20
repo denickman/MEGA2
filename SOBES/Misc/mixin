@@ -1,0 +1,62 @@
+Mixin — кратко
+
+Это класс, который не предназначен для самостоятельного использования,
+а добавляет готовый набор функциональности в другие классы через множественное наследование.
+ Не "является" чем-то сам по себе, а просто "подмешивает" (mix in) поведение.
+
+
+
+Простой пример без Pydantic — чистый Python
+============================================
+ class TimestampMixin:
+    def get_age_seconds(self):
+        return time.time() - self.created_at
+
+class LoggingMixin:
+    def log(self, message):
+        print(f"[{self.__class__.__name__}] {message}")
+
+class User(TimestampMixin, LoggingMixin):
+    def __init__(self, name):
+        self.name = name
+        self.created_at = time.time()
+
+u = User("Den")
+u.log("создан")              # пришло из LoggingMixin
+print(u.get_age_seconds())    # пришло из TimestampMixin
+
+
+User сам по себе не писал бы весь этот код — он просто "взял" готовые куски функциональности из двух миксинов.
+
+
+В Pydantic — та же идея, для переиспользования полей/валидации между моделями
+============================================
+
+from pydantic import BaseModel
+
+class TimestampMixin(BaseModel):
+    created_at: datetime
+    updated_at: datetime
+
+class IDMixin(BaseModel):
+    id: int
+
+class User(IDMixin, TimestampMixin):
+    name: str
+    email: str
+
+# User автоматически получает поля id, created_at, updated_at — не переписывая их
+u = User(id=1, name="Den", email="den@x.com", created_at=..., updated_at=...)
+
+
+
+
+Вместо того чтобы в каждой Pydantic-модели заново писать id: int, created_at: datetime, updated_at: datetime —
+выносишь это один раз в миксин и подключаешь через наследование везде, где нужно.
+
+Суть одной фразой
+
+Mixin — это способ переиспользовать кусок функциональности/полей между несколькими несвязанными классами,
+ не создавая общую "родительскую" иерархию в привычном смысле (User — это не "вид" TimestampMixin, просто берёт его возможности).
+
+
