@@ -5,41 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../FASTAPIBLOG/routers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../FASTAPIBLOG/routers/posts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../FASTAPIBLOG/routers/users.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/SOBES.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/@property.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FastAPIMisc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/ORM" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/REST Endpoints Rules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/access+refresh tokens" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/cookies" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/mixin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/n+1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/nginx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/sql+injection" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/БД - Индексы" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/БД - Нормальные формы " afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/БД-ACID" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/БД-тразнакции" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Сложность Алгоритмов" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coroutine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataclass.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/decorator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dunder_methods.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/garbage_collector.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patterns.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ASYNCIO/async_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ASYNCIO/async_example.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../FASTAPIBLOG/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/../FASTAPIBLOG/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../FASTAPIBLOG/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../FASTAPIBLOG/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../FASTAPIBLOG/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/../FASTAPIBLOG/schemas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FastAPI.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/Tricks" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/http" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/broker_kafka.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
