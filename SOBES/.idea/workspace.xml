@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FastAPI.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Tricks" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/http" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/broker_kafka.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/ASYNCs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
