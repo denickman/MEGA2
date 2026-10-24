@@ -5,7 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Misc/ASYNCs" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/ASYNCs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SQLAlchemy/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SQLAlchemy/core.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SQLAlchemy/database.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SQLAlchemy/models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SQLAlchemy/sqla_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +64,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/SQLAlchemy" />
       <recent name="$PROJECT_DIR$/Misc" />
     </key>
   </component>
