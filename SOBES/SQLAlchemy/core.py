@@ -1,6 +1,6 @@
 from sqlalchemy import text, insert, MetaData, Table
 from database import sync_engine, session_factory, Base
-from models import metadata_object, workers_table, WorkerOrm
+from models import metadata_object, workers_table, WorkersOrm
 
 
 
@@ -38,8 +38,8 @@ def insert_data():
 def insert_data():
 
     with session_factory() as session:
-        worker_bobr = WorkerOrm(username='bobr')
-        worker_volk = WorkerOrm(username='volk')
+        worker_bobr = WorkersOrm(username='bobrenak')
+        worker_volk = WorkersOrm(username='volkishe')
         # session.add(worker_bobr)
         # session.add(worker_volk)
         session.add_all([worker_bobr, worker_volk])

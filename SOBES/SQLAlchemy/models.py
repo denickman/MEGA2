@@ -1,13 +1,72 @@
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, create_engine
-from database import Base
+import datetime
+from turtledemo import forest
+
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, create_engine, func, text
+from database import Base, str_200
 from sqlalchemy.orm import Mapped, mapped_column
+import enum
+from typing import Optional, Annotated
+
+
+intpk = Annotated[int, mapped_column(primary_key=True)]
+created_at = Annotated[datetime.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
+updated_at = Annotated[datetime.datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"),
+                                                          onupdate=datetime.datetime.now)]
+
+
+
+class WorkLoad(enum.Enum):
+    parttime = 'parttime'
+    fulltime = 'fulltime'
+
+
 
 
 # declarative style
-class WorkerOrm(Base):
-    __tablename__ = 'workers_orm'
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column()
+class WorkersOrm(Base):
+    __tablename__ = 'workers'
+    #id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[intpk]
+    username: Mapped[str] # = mapped_column() you may not write mapped_column
+
+
+class ResumesOrm(Base):
+    __tablename__ = 'resumes'
+
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[intpk]
+    title: Mapped[str_200] # = mapped_column(String(50))
+    compensation: Mapped[int | None]
+    workload: Mapped[WorkLoad]
+    worker_id: Mapped[int] = mapped_column(ForeignKey('workers.id', ondelete="CASCADE")) # 'SET NULL'
+    # created_at: Mapped[datetime.datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+    # updated_at: Mapped[datetime.datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
+    #                                                       onupdate=datetime.datetime.now)
+    created_at: Mapped[created_at]
+    updated_at: Mapped[updated_at]
+
+'''
+server_default — значение по умолчанию задаётся на уровне базы данных. Оно прописывается прямо в DDL (CREATE TABLE), 
+и БД сама подставляет его, если значение не передано в INSERT — даже если запись делается не через SQLAlchemy 
+(сырым SQL, другим приложением, вручную в консоли БД).
+
+python
+created_at: Mapped[datetime.datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+
+default — значение задаётся на уровне Python/SQLAlchemy, перед отправкой INSERT в базу. Если ты создашь объект без 
+этого поля, SQLAlchemy сам вычислит значение в момент сохранения и добавит его в запрос. Но если кто-то вставит 
+запись в обход SQLAlchemy (сырым SQL), это значение не подставится.
+
+python
+created_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now)
+
+Коротко: server_default — гарантия на уровне БД (надёжнее, работает всегда), default — гарантия на уровне приложения 
+(работает только если вставка идёт через SQLAlchemy).
+ '''
+
+
+
+
 
 
 # imperative style

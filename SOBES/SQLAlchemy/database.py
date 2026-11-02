@@ -1,4 +1,6 @@
-from sqlalchemy import create_engine, text
+from typing import Annotated
+
+from sqlalchemy import create_engine, text, String
 from config import settings
 from sqlalchemy.orm import sessionmaker, Session, DeclarativeBase
 
@@ -64,8 +66,12 @@ Base.metadata.create_all(sync_engine) создаст сразу все табл�
 чтобы все модели жили в одном реестре метаданных.
 '''
 
+str_200 = Annotated[str, 200]
+
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {
+         str_200: String(200)
+    }
 
 
 

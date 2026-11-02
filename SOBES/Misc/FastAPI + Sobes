@@ -1,0 +1,943 @@
+
+========================BAD====================================
+
+@router.post("/orders")
+async def create_order(payload: OrderPayload, db):
+    order = Order(
+        user_id=payload.user_id,
+        course_id=payload.course_id,
+        price=payload.price,
+        status=payload.status,
+    )
+
+    db.add(order)
+    await db.commit()
+
+    return {"order_id": order.id}
+
+
+======= Good =======
+
+@router.post("/orders")
+async def create_order(
+    payload: OrderPayload,
+    db,
+    current_user: User = Depends(get_current_user),
+):
+    # Проверяем, что курс реально существует, и берём ЕГО цену — а не из payload
+    course = await db.get(Course, payload.course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    order = Order(
+        user_id=current_user.id,   # берём из токена, а не из тела запроса
+        course_id=payload.course_id,
+        price=course.price,          # цена с сервера, клиент её не контролирует
+        status="pending",             # сервер сам решает начальный статус
+    )
+
+    db.add(order)
+    await db.commit()
+
+    return {"order_id": order.id}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==================Bad===================
+
+@router.post("/users/{user_id}/role")
+async def change_role(user_id: int, payload: RolePayload, db):
+    user = await db.get(User, user_id)
+    user.role = payload.role
+    await db.commit()
+
+    return {"role": user.role}
+
+==================GOOD===================
+
+@router.post("/users/{user_id}/role")
+async def change_role(
+    user_id: int,
+    payload: RolePayload,
+    db,
+    current_user: User = Depends(get_current_user),
+):
+    # Только админ может менять роли
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    user = await db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.role = payload.role
+    await db.commit()
+
+    return {"role": user.role}
+
+
+
+==================================================ПОЯСНЕНИЯ========================================================
+
+
+1. current_user: User = Depends(get_current_user)
+Это стандартный паттерн FastAPI — Depends подключает функцию, которая достаёт и проверяет JWT-токен из заголовка
+Authorization, находит по нему пользователя в БД и возвращает его объект. Если токена нет или он невалиден —
+get_current_user сама кинет 401 Unauthorized, и код эндпоинта вообще не выполнится. Примерная реализация такой зависимости:
+Теперь у нас есть проверенный, настоящий current_user — тот, кто реально прислал валидный токен, а не тот,
+кем он представился в теле запроса.
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)) -> User:
+    payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+    user_id = payload.get("sub")
+    user = await db.get(User, user_id)
+    if not user:
+        raise HTTPException(401, "Invalid token")
+    return user
+
+
+
+2. user_id=current_user.id вместо payload.user_id
+Раньше клиент сам говорил "я — пользователь с id=5" прямо в JSON. Теперь — user_id определяется исключительно по тому,
+ кто аутентифицирован (чей токен прошёл проверку). Подделать это нельзя, не имея валидного чужого токена.
+ OrderPayload теперь вообще не должен содержать поле user_id — его там быть не должно.
+
+3. price=course.price вместо payload.price
+Цена больше не берётся из запроса клиента — она подтягивается с сервера, из таблицы courses, по course_id.
+Клиент может прислать какую угодно цену в JSON — она просто игнорируется, в заказ попадёт только то значение,
+что реально хранится в БД.
+
+4. Явная проверка if not course: raise HTTPException(404, ...)
+Если course_id в запросе — несуществующий (опечатка, устаревший id, попытка атаки), раньше код бы упал с AttributeError
+при обращении к course.price (500-я ошибка, "непонятно что сломалось"). Теперь — явная, понятная 404 Not Found.
+
+5. status="pending" — жёстко зашито сервером
+Статус заказа больше не приходит от клиента. Все заказы создаются в одном известном начальном состоянии.
+Переход в "paid" должен происходить в другом месте — например, в вебхуке от платёжного провайдера
+(Stripe/LiqPay и т.п.), который сервер получает напрямую от платёжной системы, а не от браузера пользователя.
+
+6. if current_user.role != "admin": raise HTTPException(403, ...)
+Это главный фикс всего кода. Теперь прежде чем что-то менять, эндпоинт проверяет — а имеет ли право вызывающий
+(не тот, чью роль меняют, а тот, кто делает запрос) совершать это действие. 403 Forbidden означает "я тебя узнал,
+но тебе сюда нельзя" (в отличие от 401, который означает "я вообще не понимаю, кто ты").
+
+7. if not user: raise HTTPException(404, ...) во втором эндпоинте
+Та же логика, что и с курсом — если user_id из URL не существует в БД, вместо падения с AttributeError получаем понятную 404.
+
+
+Что ещё стоит иметь в виду (за рамками этого конкретного кода)
+Pydantic-схема для payload должна явно ограничивать, какие поля вообще может прислать клиент —
+если OrderPayload вообще не содержит user_id/price/status как поля, то их физически нельзя будет передать,
+даже случайно. Это дополнительный защитный слой "на уровне контракта", а не только логики эндпоинта.
+Rate limiting на /orders — чтобы нельзя было наспамить тысячи заказов за секунду.
+Логирование изменений роли (change_role) — это достаточно чувствительное действие,
+стоит писать в отдельный audit log, кто, кому и когда поменял роль — полезно при расследовании инцидентов
+
+
+============================================================================================================
+
+
+
+
+==== BAD ====
+
+@router.delete("/posts/{post_id}")
+async def delete_post(post_id: int, db):
+    post = await db.get(Post, post_id)
+    await db.delete(post)
+    await db.commit()
+
+    return {"ok": True}
+
+
+@router.patch("/courses/{course_id}")
+async def update_course(course_id: int, payload: UpdateCoursePayload, db):
+    course = await db.get(Course, course_id)
+    course.title = payload.title
+    course.price = payload.price
+    await db.commit()
+
+    return {"ok": True}
+
+
+
+===== GOOD =====
+
+
+@router.delete("/posts/{post_id}")
+async def delete_post(
+    post_id: int,
+    db,
+    current_user: User = Depends(get_current_user),
+):
+    post = await db.get(Post, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    # Удалить может либо автор поста, либо админ
+    if post.author_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    await db.delete(post)
+    await db.commit()
+
+    return {"ok": True}
+
+
+@router.patch("/courses/{course_id}")
+async def update_course(
+    course_id: int,
+    payload: UpdateCoursePayload,
+    db,
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    course = await db.get(Course, course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    course.title = payload.title
+    course.price = payload.price
+    await db.commit()
+
+    return {"ok": True}
+
+
+
+
+
+==================================================ПОЯСНЕНИЯ========================================================
+
+1. Нет аутентификации вообще — главная проблема обоих эндпоинтов
+
+Ни в delete_post, ни в update_course раньше не было никакой проверки, кто вызывает эндпоинт.
+Любой анонимный запрос мог удалить чужой пост или поменять цену/название любого курса. Добавил current_user:
+User = Depends(get_current_user) — теперь запрос без валидного токена вообще не дойдёт до тела функции.
+
+2. delete_post — нет проверки владения (ownership)
+
+Это тонкий момент, которого не было во втором примере ранее — просто быть аутентифицированным недостаточно.
+Если я залогинен как пользователь №5, это не значит, что я имею право удалить пост пользователя №12. Нужна проверка:
+
+if post.author_id != current_user.id and current_user.role != "admin":
+    raise HTTPException(403, "Forbidden")
+
+
+Это пускает либо автора поста, либо админа — любой другой обычный пользователь получит 403.
+Без этой проверки у тебя была бы классическая IDOR-уязвимость: достаточно перебирать post_id в URL, чтобы удалять чужой контент.
+
+3. update_course — только админ, т.к. у курса обычно нет "автора"-обычного пользователя
+
+В отличие от постов, курсы, как правило, создаются/редактируются только администраторами/преподавателями платформы,
+а не рядовыми пользователями — поэтому тут достаточно простой проверки роли, без логики "владелец ли ты курса"
+(если только в твоей модели не предусмотрены "преподаватели — авторы своих курсов", тогда нужна была бы та же логика,
+что и в delete_post).
+
+
+
+4. Нет проверки на None после db.get() — в обоих случаях
+post = await db.get(Post, post_id)
+await db.delete(post)   # если post is None — упадёт с ошибкой
+
+
+Если post_id/course_id не существует, db.get() вернёт None, и попытка удалить/изменить None упадёт с
+малопонятной 500-й ошибкой. Добавил явный 404:
+
+if not post:
+    raise HTTPException(404, "Post not found")
+
+
+
+
+5. Порядок проверок важен — сначала существование, или сначала права?
+
+Обрати внимание: в delete_post я сначала проверяю if not post (404), а уже потом проверяю права (403).
+В update_course — наоборот, сначала права, потом существование. Разница тут в том, что в delete_post для
+проверки прав (post.author_id) мне нужен сам объект post — проверить владение без него нельзя. А в update_course
+права пользователя (админ/не админ) не зависят от конкретного курса, поэтому эту проверку можно сделать раньше и
+сэкономить один запрос в БД, если пользователь всё равно не админ.
+
+
+
+
+Общий паттерн, который теперь проступает во всех 4 эндпоинтах:
+Это стандартная последовательность проверок для почти любого защищённого CRUD-эндпоинта:
+аутентификация → существование ресурса → авторизация/владение → сама операция.
+Стоит держать её в голове как чеклист при написании любого нового эндпоинта, который что-то создаёт/меняет/удаляет.
+
+async def some_endpoint(
+    id: int,
+    payload: SomePayload,
+    db,
+    current_user: User = Depends(get_current_user),   # 1. кто ты?
+):
+    obj = await db.get(Model, id)
+    if not obj:
+        raise HTTPException(404, "...")                  # 2. существует ли объект?
+
+    if не_имеет_права(current_user, obj):
+        raise HTTPException(403, "Forbidden")              # 3. есть ли у тебя права на ЭТО действие над ЭТИМ объектом?
+
+    # 4. только теперь — собственно бизнес-логика
+    ...
+
+
+
+==================================================BAD==========================================================
+
+@router.post("/orders/{order_id}/pay")
+async def pay_order(order_id: int, db):
+    try:
+        order = await db.get(Order, order_id)
+
+        if order.status != "new":
+            raise ValueError("Order must be new")
+
+        payment = await create_payment(order)
+        order.payment_id = payment.id
+        await db.commit()
+
+        return {"payment_id": payment.id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+==================================================GOOD========================================================
+
+@router.post("/orders/{order_id}/pay")
+async def pay_order(
+    order_id: int,
+    db,
+    current_user: User = Depends(get_current_user),
+):
+    order = await db.get(Order, order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    if order.status != "new":
+        raise HTTPException(status_code=409, detail="Order must be new")
+
+    try:
+        payment = await create_payment(order)
+    except PaymentProviderError as e:
+        raise HTTPException(status_code=502, detail="Payment provider error")
+
+    order.payment_id = payment.id
+    order.status = "awaiting_payment"
+    await db.commit()
+
+    return {"payment_id": payment.id}
+
+
+==================================================ПОЯСНЕНИЯ========================================================
+
+1. Нет аутентификации/авторизации — та же проблема, что и везде ранее
+
+Снова ничто не мешает оплатить (точнее, инициировать оплату) чужого заказа — ни проверки, кто вызывает, ни проверки,
+что заказ принадлежит этому пользователю. Добавил current_user + проверку order.user_id != current_user.id.
+
+2. Нет проверки None после db.get()
+order = await db.get(Order, order_id)
+if order.status != "new":   # упадёт с AttributeError, если order is None
+
+Несуществующий order_id → AttributeError → попадает в except Exception → превращается в 500.
+Пользователь получает малоинформативную ошибку вместо понятной 404 Not Found. Добавил явную проверку.
+
+3. Голый except Exception — это самая серьёзная структурная проблема кода
+except Exception as e:
+    raise HTTPException(status_code=500, detail=str(e))
+
+Тут сразу несколько проблем:
+
+a) Все ошибки превращаются в 500, даже когда это неправильно. ValueError("Order must be new") —
+это не "внутренняя ошибка сервера", это ожидаемая бизнес-ситуация (заказ уже оплачен/отменён).
+Правильный код ответа тут — 409 Conflict (конфликт состояния ресурса), а не 500. 500 должен означать
+"что-то реально сломалось непредвиденно", а не "клиент попытался оплатить уже оплаченный заказ".
+
+b) detail=str(e)) — утечка внутренней информации клиенту. Если create_payment() упадёт с ошибкой БД или
+SQL-исключением, в str(e) может оказаться что угодно — путь к файлу, фрагмент SQL-запроса, внутренняя структура данных.
+Отдавать это напрямую в HTTP-ответ — риск раскрытия внутреннего устройства системы атакующему. Внутренние ошибки
+нужно логировать на сервере, а наружу отдавать общий текст:
+
+except Exception as e:
+    logger.exception("Unexpected error in pay_order")
+    raise HTTPException(500, "Internal server error")
+
+c) Слишком широкий except Exception маскирует programming errors. Если в коде опечатка (order.statsu вместо order.status),
+это тоже тихо превратится в красивый 500 {"detail": "'Order' object has no attribute 'statsu'"} вместо того,
+чтобы явно уронить сервер с трейсбеком в логах во время разработки/тестирования. Хорошая практика —
+ ловить конкретные ожидаемые исключения, а не всё подряд.
+
+4. raise ValueError внутри try вместо HTTPException напрямую
+
+Использование ValueError для бизнес-логики и последующая его "ловля" в except Exception — это окольный путь.
+Проще и понятнее сразу кидать HTTPException с правильным статусом в нужном месте, без try/except-прослойки:
+
+if order.status != "new":
+    raise HTTPException(status_code=409, detail="Order must be new")
+5. Отдельная обработка ошибок платёжного провайдера
+
+Если create_payment() стучится во внешний сервис (Stripe/LiqPay), там может случиться сетевая ошибка,
+таймаут, провайдер может быть недоступен — это отдельная, ожидаемая категория ошибок, не связанная с
+ошибкой в твоём коде. Правильный код для "внешняя зависимость недоступна/ошиблась" — 502 Bad Gateway, а не 500:
+
+try:
+    payment = await create_payment(order)
+except PaymentProviderError as e:
+    raise HTTPException(status_code=502, detail="Payment provider error")
+
+6. Добавил промежуточный статус order.status = "awaiting_payment"
+
+Небольшое архитектурное замечание: после инициации оплаты заказ скорее всего ещё не оплачен фактически —
+платёж только создан у провайдера, но подтверждение (успех/неудача) обычно приходит позже, асинхронно,
+через webhook от платёжной системы. Поэтому статус "new" стоит менять не сразу на "оплачено",
+а на промежуточный "awaiting_payment", а уже отдельный webhook-эндпоинт (который слушает колбэки от провайдера)
+переведёт заказ в "paid" или "payment_failed" по факту реального результата оплаты.
+
+7. Race condition — на будущее, стоит иметь в виду
+
+Если два запроса на оплату одного и того же заказа прилетят одновременно (двойной клик, повторная отправка
+формы), оба могут успеть пройти проверку if order.status != "new" до того, как первый из них закоммитит изменение
+статуса — и получится двойная оплата. Решается через блокировку на уровне БД (SELECT ... FOR UPDATE) или уникальный
+constraint, не критично для джуновского уровня прямо сейчас, но стоит знать, что эта проблема существует в подобных
+"проверить-потом-изменить" сценариях.
+
+
+
+
+
+
+
+
+==================================================BAD========================================================
+@router.post("/orders")
+async def create_order(payload: OrderPayload, db):
+    user = await db.get_user(payload.user_id)
+
+    if not user:
+        return {"error": "user not found"}
+
+    if payload.promocode:
+        discount = await db.get_promocode_discount(payload.promocode)
+    else:
+        discount = 0
+
+    total = payload.price - discount
+
+    order = await db.create_order(
+        user_id=payload.user_id,
+        course_id=payload.course_id,
+        price=total,
+    )
+
+    async with httpx.AsyncClient() as client:
+        payment = await client.post(
+            url="https://payments.example.com/pay",
+            json={"order_id": order.id, "amount": total},
+        )
+
+    await db.update_order_payment_id(order.id, payment.json()["payment_id"])
+    await send_email(user.email, text="Ваш заказ создан")
+
+    return {"order_id": order.id, "payment": payment.json()}
+
+
+
+
+==================================================GOOD========================================================
+@router.post("/orders")
+async def create_order(
+    payload: OrderPayload,
+    db,
+    current_user: User = Depends(get_current_user),
+):
+    course = await db.get_course(payload.course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    discount = 0
+    if payload.promocode:
+        discount = await db.get_promocode_discount(payload.promocode)
+        if discount is None:
+            raise HTTPException(status_code=400, detail="Invalid promocode")
+
+    total = max(course.price - discount, 0)
+
+    order = await db.create_order(
+        user_id=current_user.id,
+        course_id=payload.course_id,
+        price=total,
+        status="pending",
+    )
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
+                url="https://payments.example.com/pay",
+                json={"order_id": order.id, "amount": total},
+            )
+            response.raise_for_status()
+            payment = response.json()
+    except httpx.HTTPError:
+        order.status = "payment_failed"
+        await db.commit()
+        raise HTTPException(status_code=502, detail="Payment provider error")
+
+    order.payment_id = payment["payment_id"]
+    order.status = "awaiting_payment"
+    await db.commit()
+
+    try:
+        await send_email(current_user.email, text="Ваш заказ создан")
+    except Exception:
+        logger.exception("Failed to send order confirmation email")
+
+    return {"order_id": order.id, "payment_id": payment["payment_id"]}
+
+
+==================================================ПОЯСНЕНИЯ========================================================
+
+Пояснения
+1. price=payload.price — клиент снова сам задаёт цену
+
+Та же уязвимость, что мы разбирали раньше, только тут она ещё хитрее замаскирована: total = payload.price -
+discount выглядит как вычисление, но payload.price — это всё ещё цена, присланная клиентом. Достаточно
+отправить "price": 1 — и скидка посчитается от единицы:
+
+json
+{"user_id": 1, "course_id": 5, "price": 1, "promocode": null}
+
+Исправление — брать базовую цену курса из БД, а не из тела запроса: total = course.price - discount.
+
+2. user_id=payload.user_id — опять подмена личности
+
+Та же проблема: любой может создать заказ от чужого имени. Исправление — current_user.id, как и раньше.
+
+3. Нет проверки существования курса
+
+payload.course_id нигде не проверяется — можно создать заказ на несуществующий курс, и дальше вся цепочка
+(платёж на 0 или None цену) пойдёт по несогласованным данным. Добавил db.get_course() + 404.
+
+4. Нет проверки на невалидный промокод — потенциальный TypeError
+python
+discount = await db.get_promocode_discount(payload.promocode)
+total = payload.price - discount
+
+Если промокод не существует, get_promocode_discount скорее всего вернёт None (или кинет своё исключение,
+зависит от реализации). Если None — следующая строка payload.price - discount упадёt с TypeError: unsupported operand type(s)
+for -: 'float' and 'NoneType', и это снова превратится в неконтролируемую 500-ю ошибку. Добавил явную проверку и понятный 400.
+
+5. total может уйти в минус
+
+Если скидка больше цены (баг в промокоде, скидка 100%+ по ошибке) — total становится отрицательным, и
+ты отправишь платёжному провайдеру запрос на отрицательную сумму. В зависимости от того, как обрабатывает
+это платёжный шлюз, последствия непредсказуемы. Добавил max(course.price - discount, 0).
+
+6. Заказ создаётся ДО похода к платёжному провайдеру, и если провайдер упадёт — заказ останется в неопределённом состоянии
+
+В оригинале: если httpx-запрос к payments.example.com упадёт (таймаут, сеть недоступна, провайдер вернул 500),
+исключение просто вылетит наружу необработанным — а в БД уже останется запись order без payment_id, непонятного статуса,
+который так и зависнет навсегда. Я обернул HTTP-вызов в try/except httpx.HTTPError, и при ошибке явно перевожу заказ в
+статус "payment_failed", а наружу возвращаю понятный 502 Bad Gateway ("проблема у внешнего сервиса, не у нас").
+
+7. Нет timeout у httpx.AsyncClient()
+python
+async with httpx.AsyncClient() as client:
+
+Без явного таймаута, если платёжный сервис "подвиснет" (не ответит вообще), твой запрос будет висеть бесконечно,
+удерживая соединение/воркер — это прямой путь к тому, что твой сервис сам станет недоступен под нагрузкой
+(классический cascading failure, о котором говорили в теме httpx). Добавил timeout=10.0.
+
+8. Нет response.raise_for_status() — ошибки платёжного провайдера молча игнорируются
+python
+payment = await client.post(...)
+# а что если payments.example.com вернул 400/500?
+await db.update_order_payment_id(order.id, payment.json()["payment_id"])
+
+httpx не кидает исключение сам по себе, если сервер ответил с кодом ошибки (4xx/5xx) — он просто возвращает
+объект Response с этим статусом. Если не проверить это явно, код попытается достать payment.json()["payment_id"]
+из тела ошибки, которого там может просто не быть → KeyError/JSONDecodeError, опять неконтролируемый 500.
+response.raise_for_status() явно кидает исключение, если статус не 2xx — что мы и ловим в except httpx.HTTPError.
+
+9. Отправка email — не должна ронять весь запрос, если упадёт
+python
+await send_email(user.email, text="Ваш заказ создан")
+return {"order_id": order.id, ...}
+
+Если send_email упадёт (SMTP недоступен, таймаут) — клиент получит ошибку и не узнает о созданном заказе,
+хотя заказ-то уже реально создан и платёж инициирован. Отправка email — это best-effort побочный эффект,
+а не критичная часть бизнес-логики создания заказа: её стоит обернуть отдельным try/except, залогировать проблему,
+но не рушить весь ответ пользователю.
+
+10. Статус заказа и порядок операций
+
+Добавил status="pending" при создании и status="awaiting_payment" после успешного похода к провайдеру —
+та же логика, что в прошлом примере: реальное подтверждение оплаты ("paid") должно приходить позже через отдельный
+webhook от платёжной системы, а не присваиваться сразу при инициации платежа.
+
+Общий паттерн, который стоит вынести для себя
+
+Когда эндпоинт создаёт что-то в БД + ходит во внешний сервис — это одна из самых частых точек, где рождаются
+трудноуловимые баги в проде:
+
+Что если внешний сервис недоступен/медленный? → таймауты + явная обработка ошибок
+Что если внешний сервис ответил ошибкой? → проверка статуса ответа, не слепое доверие к JSON
+В каком состоянии останется БД, если шаг 2 (поход во внешний сервис) провалится после шага 1 (создание записи)? →
+промежуточные статусы, чтобы не оставлять "подвисшие" записи
+Какие побочные эффекты (email, уведомления) можно потерять без вреда для пользователя, а какие — нет? →
+best-effort операции оборачивать отдельно, не давать им ронять основной ответ
+
+
+
+
+
+
+===================================================BAD=========================================================
+
+
+# Плохо
+router = APIRouter()
+users_online = {}
+
+@router.get("/profile/{user_id}")
+async def get_profile(user_id: int):
+    users_online[user_id] = True
+
+    redis = Redis(host="localhost", port=6379)
+    cached = await redis.get(f"profile:{user_id}")
+
+    if cached:
+        return cached
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"https://users.example.com/{user_id}")
+
+    await redis.set(name=f"profile:{user_id}", response.text)
+    return response.json()
+
+
+Проблемы:
+
+Redis-клиент создаётся на каждый запрос — это соединение, а не бесплатная операция. Нужен один клиент на всё приложение.
+Разные типы ответа — из кэша возвращается сырая строка/байты, а без кэша — dict (response.json()). Клиент получит то JSON, то строку.
+Нет TTL — кэш никогда не истекает, данные протухнут навсегда.
+Нет проверки статуса ответа — ошибка от users.example.com (404/500) всё равно закэшируется и будет отдаваться дальше.
+users_online — обычный dict в памяти, не потокобезопасен и не переживёт рестарт/несколько воркеров — это не повод для кэша в Redis.
+
+
+
+
+
+
+===================================================GODD=========================================================
+
+# Лучше
+router = APIRouter()
+redis = Redis(host="localhost", port=6379)  # один клиент на всё приложение
+
+@router.get("/profile/{user_id}")
+async def get_profile(user_id: int):
+    cached = await redis.get(f"profile:{user_id}")
+    if cached:
+        return json.loads(cached)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"https://users.example.com/{user_id}")
+        response.raise_for_status()  # не кэшируем ошибки
+
+    data = response.json()
+    await redis.set(f"profile:{user_id}", json.dumps(data), ex=300)  # TTL 5 минут
+    return data
+
+users_online отдельная забота — для онлайн-статуса лучше redis.setex с коротким TTL, а не dict в памяти процесса.
+
+
+
+
+
+
+
+===================================================BAD=======================================================
+
+
+# Плохо
+router = APIRouter()
+
+@router.post("/payments/{payment_id}/check")
+async def check_payment(payment_id: str, db):
+    response = httpx.get(f"https://payments.example.com/{payment_id}")
+    data = response.json()
+
+    if data["status"] == "paid":
+        order = await db.get(Order, data["order_id"])
+        order.status = "paid"
+        await db.commit()
+
+    return {"status": data["status"]}
+
+    Проблемы:
+
+Синхронный httpx.get в async-функции — блокирует event loop, сводит на нет весь смысл async.
+Нет проверки статуса ответа (raise_for_status) — ошибка от payments.example.com улетит в data["status"] как KeyError, либо вообще проигнорируется.
+Нет идемпотентности — повторный вызов (ретрай вебхука, дважды нажатая кнопка) снова спишет order.status = "paid" и закоммитит, без проверки, не обработан ли платёж уже.
+Нет проверки, что order найден — если db.get вернёт None, упадёт на order.status = ....
+Чужому сервису слепо доверяем — нет проверки подписи/источника запроса на check, по сути любой может дёрнуть эндпоинт с нужным payment_id.
+
+
+
+===================================================GOOD=======================================================
+# Лучше
+router = APIRouter()
+
+@router.post("/payments/{payment_id}/check")
+async def check_payment(payment_id: str, db):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"https://payments.example.com/{payment_id}")
+        response.raise_for_status()
+
+    data = response.json()
+
+    if data["status"] == "paid":
+        order = await db.get(Order, data["order_id"])
+        if order is None:
+            raise HTTPException(404, "Order not found")
+        if order.status != "paid":  # идемпотентность
+            order.status = "paid"
+            await db.commit()
+
+    return {"status": data["status"]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===================================================BAD=======================================================
+# Плохо
+from fastapi import APIRouter
+
+from .support import (
+    generate_report,
+    send_email,
+    sync_crm,
+)
+
+router = APIRouter()
+
+@router.post("/reports")
+async def create_report(payload, db):
+    report = await generate_report(payload.user_id)
+    await send_email(payload.email, report.url)
+    await sync_crm(payload.user_id, report.url)
+
+    return {"url": report.url}
+
+    Проблемы:
+
+Три последовательных шага без обработки ошибок — если send_email упадёт, отчёт уже сгенерирован, но пользователь получит 500 и не узнает про report.url; если упадёт sync_crm — письмо уже ушло, а CRM рассинхронизирована. Нет отката/компенсации.
+Долгий запрос блокирует HTTP-ответ — генерация отчёта + письмо + CRM может занять секунды/минуты, а клиент всё это время держит открытый запрос (и рискует таймаутом).
+Нет идемпотентности — повторный вызов (ретрай от клиента) заново сгенерирует отчёт, заново отправит письмо, заново дёрнет CRM.
+Непонятная обработка частичного отказа — если sync_crm недоступна, вся операция фейлится целиком, хотя отчёт уже готов и письмо отправлено — это не атомарная транзакция, а независимые внешние сервисы.
+db в сигнатуре не используется — либо лишний параметр, либо отчёт должен сохраняться в БД, но это нигде не делается.
+
+
+
+===================================================Good======================================================
+# Лучше
+router = APIRouter()
+
+@router.post("/reports", status_code=202)
+async def create_report(payload, db, background_tasks: BackgroundTasks):
+    report = await generate_report(payload.user_id)
+    await db.save(report)  # сразу фиксируем результат
+
+    background_tasks.add_task(send_email, payload.email, report.url)
+    background_tasks.add_task(sync_crm, payload.user_id, report.url)
+
+    return {"url": report.url}
+
+Основной шаг (генерация) выполняется синхронно и сразу сохраняется — это то, что реально нужно пользователю. Побочные эффекты (письмо, CRM) вынесены в фон, их отказ не роняет основной ответ; в проде для них лучше ещё и очередь с ретраями (Celery/RQ), а не просто BackgroundTasks.
+
+
+
+
+
+
+
+===================================================BAD=======================================================
+
+# Плохо
+from sqlalchemy import select
+from .support import Course, Enrollment, EnrollPayload
+
+router = APIRouter()
+
+@router.post("/courses/{course_id}/enroll")
+async def enroll(course_id: int, payload: EnrollPayload, db):
+    course = await db.scalar(
+        select(Course).where(Course.id == course_id)
+    )
+
+    course.available_seats = course.available_seats - 1
+
+    enrollment = Enrollment(user_id=payload.user_id, course_id=course.id)
+    db.add(enrollment)
+
+    await db.commit()
+
+    return {"available_seats": course.available_seats}
+
+
+Проблемы:
+
+Race condition — при одновременных запросах два запроса читают одно и то же available_seats, оба уменьшают его на 1 независимо друг от друга → реальное место останется, а места "уйдут в минус" или перепродадутся (classic lost update).
+Нет проверки, что course найден — db.scalar вернёт None на несуществующий course_id, следующая строка упадёт с AttributeError.
+Нет проверки available_seats > 0 — можно уйти в отрицательные значения, запись всё равно будет сохранена.
+Нет защиты от повторной записи одного и того же пользователя — ничто не мешает записаться на курс дважды (если нет unique-constraint на БД).
+Транзакция и бизнес-проверка не атомарны — между select и update нет блокировки строки.
+
+
+===================================================Good======================================================
+# Лучше
+router = APIRouter()
+
+@router.post("/courses/{course_id}/enroll")
+async def enroll(course_id: int, payload: EnrollPayload, db):
+    course = await db.scalar(
+        select(Course).where(Course.id == course_id).with_for_update()  # блокируем строку
+    )
+    if course is None:
+        raise HTTPException(404, "Course not found")
+    if course.available_seats <= 0:
+        raise HTTPException(409, "No seats available")
+
+    existing = await db.scalar(
+        select(Enrollment).where(
+            Enrollment.user_id == payload.user_id,
+            Enrollment.course_id == course_id,
+        )
+    )
+    if existing:
+        raise HTTPException(409, "Already enrolled")
+
+    course.available_seats -= 1
+    db.add(Enrollment(user_id=payload.user_id, course_id=course.id))
+    await db.commit()
+
+    return {"available_seats": course.available_seats}
+
+
+
+with_for_update() блокирует строку курса до конца транзакции — конкурентные запросы встанут в очередь и увидят актуальное число мест, а не устаревшее.
+
+
+
+
+
+
+
+===================================================BAD=======================================================
+# Плохо
+router = APIRouter()
+
+@router.post("/orders/{order_id}/confirm")
+async def confirm_order(order_id: int, db):
+    order = await db.scalar(select(Order).filter(Order.id == order_id))
+    order.status = "confirming"
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://delivery.example.com/orders",
+            json={"order_id": order.id, "address": order.address},
+        )
+
+    order.delivery_id = response.json()["delivery_id"]
+    order.status = "confirmed"
+
+    await db.commit()
+
+    return {"ok": True}
+
+Проблемы:
+
+Нет проверки, что order найден — None упадёт с AttributeError на order.status = ....
+order.status = "confirming" не закоммичен перед внешним запросом — если процесс упадёт прямо во время HTTP-вызова, в БД останется старый статус, а промежуточное состояние потеряно; смысла в нём нет, раз оно не сохраняется.
+Нет проверки статуса ответа — raise_for_status() отсутствует, ошибка/невалидный JSON от delivery-сервиса уронит response.json()["delivery_id"] с неясной ошибкой.
+Нет идемпотентности — повторный вызов (ретрай) снова создаст заказ в delivery-сервисе и получит новый delivery_id, то есть задвоит доставку.
+Нет отката при ошибке — если HTTP-запрос зафейлится после order.status = "confirming", заказ так и останется висеть в этом статусе навсегда (нет try/except, не возвращаем в "pending" или "failed").
+
+
+
+===================================================Good======================================================
+# Лучше
+router = APIRouter()
+
+@router.post("/orders/{order_id}/confirm")
+async def confirm_order(order_id: int, db):
+    order = await db.scalar(select(Order).filter(Order.id == order_id))
+    if order is None:
+        raise HTTPException(404, "Order not found")
+    if order.status == "confirmed":
+        return {"ok": True}  # идемпотентность
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://delivery.example.com/orders",
+                json={"order_id": order.id, "address": order.address},
+            )
+            response.raise_for_status()
+    except httpx.HTTPError:
+        order.status = "failed"
+        await db.commit()
+        raise HTTPException(502, "Delivery service unavailable")
+
+    order.delivery_id = response.json()["delivery_id"]
+    order.status = "confirmed"
+    await db.commit()
+
+    return {"ok": True}
+
+
+
+
+
+
+
+
