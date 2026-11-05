@@ -17,3 +17,23 @@ u = User("den")
 print(u.name)      # "den" — сработал геттер (@property)
 u.name = "maria"    # сработал сеттер (@name.setter)
 print(u.name)        # "Maria"
+
+
+# @property умеет перехватывать три операции: чтение, запись, удаление.
+
+@property
+def name(self):          # user.name           → геттер
+    return self._name
+
+@name.setter
+def name(self, value):   # user.name = "Den"    → сеттер
+    self._name = value
+
+@name.deleter
+def name(self):           # del user.name       → делитер
+    del self._name
+
+'''
+del user.name — довольно редкая операция, но если её кто-то вызовет, а делитера нет — будет AttributeError. 
+@name.deleter нужен, только если ты хочешь явно разрешить/обработать удаление атрибута.
+'''

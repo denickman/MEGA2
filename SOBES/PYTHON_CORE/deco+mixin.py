@@ -1,0 +1,126 @@
+from functools import wraps
+
+
+print('----functools.wraps-----')
+# functools.wraps - Decorators
+
+
+
+def my_decorator(func):
+    def wrapper(*args, **kwargs):
+        print("До вызова")
+        return func(*args, **kwargs)
+    return wrapper
+
+@my_decorator
+def hello():
+    """Это документация"""
+    print("Привет")
+
+print(hello.__name__)   # wrapper   ← плохо
+print(hello.__doc__)    # None      ← плохо
+
+print('----my deco-----')
+def my_deco(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("---Before call----")
+        return func(*args, **kwargs)
+    return wrapper
+
+@my_deco
+def hello_nigga():
+    'this is docss for the hello nigga function'
+    print("kawabunga")
+
+print(f'NAME: {hello_nigga.__name__}')
+print(f'DOC: {hello_nigga.__doc__}')
+
+
+
+print('----base deco-----')
+def base_deco(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+            print('before call')
+            result = func(*args, **kwargs)
+            print('after call')
+            return result
+    return wrapper
+
+@base_deco
+def say_hello(name: str):
+    'watafaka mazafaka'
+    print(f'hello, {name}!')
+
+say_hello('Koshake')
+
+
+print('-----logger------')
+
+def logger(func):
+    def wrapper(*args, **kwargs):
+        print(f"Вызываем {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+
+@logger
+def hello(name: str):
+    print(f'hello, {name}')
+
+hello('alexander')
+
+
+'''
+Миксин, когда нужно добавить классу новый метод/набор методов, который станет полноценной частью его API: to_json(), 
+to_dict(), validate() — что-то, что пользователь класса будет вызывать как obj.method().
+
+Миксин — это класс с реальным кодом внутри, который через наследование физически "вшивается" в твой класс. 
+Ты получаешь готовую, рабочую реализацию метода — писать её самому не нужно
+
+
+Декоратор, когда нужно изменить/дополнить поведение вызова уже существующего метода: залогировать вызов, засечь 
+время выполнения, кэшировать результат (как раз @cached_property), проверить права доступа, повторить при ошибке 
+(@retry). Декоратор не добавляет новую "способность" объекту — он модифицирует, как ведёт себя уже существующий метод при вызове.
+
+'''
+
+
+class JsonMixin:
+    def to_json(self):
+        import json
+        return json.dumps(self.__dict__)
+
+class LoggableMixin:
+    def log(self):
+        print(f"[LOG] {self}")
+
+class User(JsonMixin, LoggableMixin):
+    def __init__(self, name):
+        self.name = name
+
+u = User("Den")
+u.to_json()   # доступен как обычный метод
+u.log()       # тоже доступен
+
+
+
+
+def logged(func):
+    def wrapper(*args, **kwargs):
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+
+class User:
+    def __init__(self, name):
+        self.name = name
+
+    @logged
+    def greet(self):
+        print(f"Hi, I'm {self.name}")
+
+u = User("Den")
+u.greet()
+# Calling greet
+# Hi, I'm Den

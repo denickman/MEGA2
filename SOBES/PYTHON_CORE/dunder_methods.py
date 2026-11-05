@@ -12,6 +12,20 @@ obj1 == obj2	            __eq__
 obj1 + obj2	                __add__
 for x in obj:           	__iter__, затем __next__ на каждом шаге
 obj[key]	                __getitem__
+
+
+
+len(obj)        → obj.__len__()
+obj + other     → obj.__add__(other)
+for x in obj    → obj.__iter__()  (и потом __next__() на каждой итерации)
+print(obj)      → obj.__str__()  (если нет — fallback на __repr__)
+repr(obj)       → obj.__repr__()
+with obj as x:  → obj.__enter__() при входе, obj.__exit__() при выходе
+obj[key]        → obj.__getitem__(key)
+obj == other    → obj.__eq__(other)
+
+
+
 ========================================================================
 
 
