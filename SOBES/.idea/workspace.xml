@@ -5,24 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_01.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_02_func.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_03_exc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_04_imports/m4_config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_04_imports/m4_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_05_oop.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_06_ctx_mng.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/data.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/cached_property.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_OOP/@property+descriptor+slot.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_OOP/ABC+Protocol.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_OOP/MRO.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_OOP/__slots__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_07_deco.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_08_Async.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/Event Loop + Async" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/@property.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/@property.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/deco.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/deco+mixin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/dunder_methods.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/dunder_methods.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/manager_ctx.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/manager_ctx.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MAKEDON/Makedon_06_ctx_mng.py" beforeDir="false" afterPath="$PROJECT_DIR$/MAKEDON/Makedon_06_ctx_mng.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +47,8 @@
     "Python.Makedon_02.executor": "Run",
     "Python.Makedon_05_oop.executor": "Run",
     "Python.Makedon_06_ctx_mng.executor": "Run",
+    "Python.Makedon_07_deco.executor": "Run",
+    "Python.Makedon_08_Async.executor": "Run",
     "Python.a=1.executor": "Run",
     "Python.closures.executor": "Run",
     "Python.coroutine.executor": "Run",
