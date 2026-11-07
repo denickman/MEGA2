@@ -1,0 +1,11 @@
+docker run -d \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=admin \
+  -p 15432:5432 \
+  --name 01_mak_container \
+  postgres
+
+  — вот в этот момент и произошла "регистрация". Переменные POSTGRES_USER=postgres и POSTGRES_PASSWORD=admin
+  превратились в реального SQL-пользователя postgres с паролем admin внутри движка Postgres.
+  Раз вы подключаетесь успешно именно с postgres:admin — значит, контейнер был запущен именно с такими переменными
+   (или это дефолт по docker-compose.yml, если вы использовали его, а не docker run напрямую).

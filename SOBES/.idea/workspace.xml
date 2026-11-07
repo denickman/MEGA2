@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_07_deco.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MAKEDON/Makedon_08_Async.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Event Loop + Async" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/SQL-Engine_Sessions" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/docker" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MAKEDON/Makedon_06_ctx_mng.py" beforeDir="false" afterPath="$PROJECT_DIR$/MAKEDON/Makedon_06_ctx_mng.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
