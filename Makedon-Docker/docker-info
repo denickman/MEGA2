@@ -1,0 +1,18 @@
+
+Остановить все запущенные контейнеры:
+docker stop $(docker ps -q)
+
+
+Удалить все контейнеры (включая остановленные):
+docker rm $(docker ps -aq)
+
+Или одной командой — остановить и сразу удалить все контейнеры:
+docker rm -f $(docker ps -aq)
+
+
+Удалить все образы:
+docker rmi -f $(docker images -q)
+
+
+Если хочешь всё сразу (контейнеры + образы + volumes + networks) одной командой:
+docker system prune -a --volumes
