@@ -5,10 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Misc/SQL-Engine_Sessions" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/docker" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/api/dependencies.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/api/routers/TaskRouter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/core/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/db/session.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/models/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/models/task.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/repos/TaskRepository.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/schemas/TaskSchema.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MAKEDON/app/services/TaskService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/SOBES.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SOBES.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FastAPI.py" beforeDir="false" afterPath="$PROJECT_DIR$/FastAPI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FastAPIMisc.py" beforeDir="false" afterPath="$PROJECT_DIR$/FastAPIMisc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MAKEDON/FastAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MAKEDON/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/decorator.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/decorator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +83,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/MAKEDON/app/api/routers" />
       <recent name="$PROJECT_DIR$/MAKEDON" />
       <recent name="$PROJECT_DIR$/PYTHON_CORE" />
       <recent name="$PROJECT_DIR$/Misc" />
