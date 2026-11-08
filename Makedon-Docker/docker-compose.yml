@@ -1,0 +1,22 @@
+services: # список контейнеров, которые будут подниматься
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin # лучше через env var  ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app: # замена docker build -t fastapi-app . + docker run fastapi-app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on: # говорит docker compose: "сначала запусти (создай) контейнер postgres, потом app
+      - postgres
+
+volumes:
+  postgres_data:
+
+    # Сеть — отдельно создавать docker network create не нужно, compose автоматически
+    # создаёт одну общую сеть для всех сервисов в этом файле
