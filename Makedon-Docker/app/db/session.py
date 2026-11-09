@@ -1,18 +1,17 @@
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.core.config import get_settings
 
-
-# просмотр таблиц - docker exec -it b9897c1e5892 psql -U postgres -d postgres -c "\dt"
-
+# просмотр таблиц - docker exec -it tasks-postgres psql -U postgres -d postgres -c "\dt"
 
 settings = get_settings()
-engine = create_engine(settings.DATABASE_URL)
+
+# echo управляется через SQL_ECHO=1, иначе SQL-лог забивает вывод
+# и в нём не видно логов кэша.
+engine = create_engine(settings.database_url, echo=settings.sql_echo, pool_pre_ping=True)
 
 SessionLocal = sessionmaker[Session](bind=engine)
-
-
 
 
 def get_db():

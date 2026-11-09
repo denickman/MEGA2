@@ -1,4 +1,16 @@
 __pycache__
 *.pyc
+*.pyo
 .git
+.gitignore
 .venv
+venv
+.idea
+.vscode
+.DS_Store
+**/.DS_Store
+docker-compose.yml
+Dockerfile
+README.md
+RUN-MANUAL.md
+docker-info

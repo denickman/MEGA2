@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.api.dependencies import get_task_service
-from app.schemas.TaskSchema import TaskSchema, TaskCreateSchema, TaskUpdateSchema
+from app.schemas.TaskRead import TaskRead, TaskCreateSchema, TaskUpdateSchema
 from app.services.TaskService import TaskService, TaskNotFound
 
 
@@ -10,16 +10,21 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.get('')
 def read_tasks(
+        response: Response,
         task_service: TaskService = Depends(get_task_service)
-) -> list[TaskSchema]:
-    return task_service.list_tasks()
+) -> list[TaskRead]:
+    tasks = task_service.list_tasks()
+    # Этот заголовок видно в Swagger в блоке Response headers:
+    # MISS — данные пришли из Postgres, HIT — из Redis.
+    response.headers["X-Cache"] = task_service.last_cache_status
+    return tasks
 
 
 @router.post('', status_code=status.HTTP_201_CREATED)
 def create_task(
         payload: TaskCreateSchema,
         task_service: TaskService = Depends(get_task_service)
-) -> TaskSchema:
+) -> TaskRead:
     return task_service.create_task(task_create=payload)
 
 
@@ -28,7 +33,7 @@ def update_task(
         task_id: str,
         payload: TaskUpdateSchema,
         task_service: TaskService = Depends(get_task_service)
-) -> TaskSchema:
+) -> TaskRead:
     try:
         return task_service.update_task(task_id=task_id, task_update=payload)
     except TaskNotFound:

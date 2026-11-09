@@ -7,16 +7,43 @@ services: # список контейнеров, которые будут по�
       POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  redis: # этого сервиса раньше не было, хотя код ждал redis://redis:6379/0
+    image: redis:8-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
 
   app: # замена docker build -t fastapi-app . + docker run fastapi-app:
     build: .
     ports:
       - "8000:8000"
-    depends_on: # говорит docker compose: "сначала запусти (создай) контейнер postgres, потом app
-      - postgres
+    environment:
+      # Хосты — это ИМЕНА СЕРВИСОВ выше. Compose поднимает общую сеть и
+      # прописывает их в DNS, поэтому "postgres" и "redis" резолвятся.
+      DATABASE_URL: postgresql+psycopg://postgres:admin@postgres:5432/postgres
+      REDIS_URL: redis://redis:6379/0
+      CACHE_TTL_SECONDS: "60"
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      SQL_ECHO: "0"
+    depends_on: # condition: service_healthy — ждём не "создан", а "реально готов принимать запросы"
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
+  redis_data:
 
     # Сеть — отдельно создавать docker network create не нужно, compose автоматически
     # создаёт одну общую сеть для всех сервисов в этом файле

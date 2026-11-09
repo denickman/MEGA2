@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 
-class TaskSchema(BaseModel):
+class TaskRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str
     title: str
