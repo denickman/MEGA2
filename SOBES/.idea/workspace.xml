@@ -5,9 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../Makedon-Docker/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-Docker/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,38 +35,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.MRO.executor": "Run",
-    "Python.Makedon_01.executor": "Run",
-    "Python.Makedon_02.executor": "Run",
-    "Python.Makedon_05_oop.executor": "Run",
-    "Python.Makedon_06_ctx_mng.executor": "Run",
-    "Python.Makedon_07_deco.executor": "Run",
-    "Python.Makedon_08_Async.executor": "Run",
-    "Python.a=1.executor": "Run",
-    "Python.closures.executor": "Run",
-    "Python.coroutine.executor": "Run",
-    "Python.deco.executor": "Run",
-    "Python.decorator.executor": "Run",
-    "Python.garbage_collector.executor": "Run",
-    "Python.m4_main.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.python_core.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.MRO.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Makedon_01.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Makedon_02.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Makedon_05_oop.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Makedon_06_ctx_mng.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Makedon_07_deco.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Makedon_08_Async.executor&quot;: &quot;Run&quot;,
+    &quot;Python.a=1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.closures.executor&quot;: &quot;Run&quot;,
+    &quot;Python.coroutine.executor&quot;: &quot;Run&quot;,
+    &quot;Python.deco.executor&quot;: &quot;Run&quot;,
+    &quot;Python.decorator.executor&quot;: &quot;Run&quot;,
+    &quot;Python.garbage_collector.executor&quot;: &quot;Run&quot;,
+    &quot;Python.m4_main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.python_core.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/MAKEDON/app/api/routers" />
