@@ -1,6 +1,28 @@
 from functools import wraps
 
 
+
+
+class MyDecorator:
+    def __init__(self, func):       # сюда попадает декорируемая функция
+        self.func = func
+
+    def __call__(self, *args, **kwargs):   # вызывается вместо исходной функции
+        print("до")
+        result = self.func(*args, **kwargs)
+        print("после")
+        return result
+
+# @MyDecorator над greet — это сокращение для greet = MyDecorator(greet).
+# Когда вы пишете greet(), Python ищет __call__ на этом объекте и выполняет его — вот тут и происходит "до/после".
+@MyDecorator
+def greet():
+    print("Привет")
+
+greet()   # на самом деле вызывает MyDecorator.__call__
+
+
+
 print('----functools.wraps-----')
 # functools.wraps - Decorators
 
