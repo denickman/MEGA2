@@ -1,6 +1,74 @@
+import functools
+
+'''
+Когда ты пишешь @limit_calls(3) над greet, происходит:
+
+limit_calls(3) вызывается один раз → возвращает decorator.
+
+decorator(greet) вызывается один раз → внутри создаётся count = 0 один раз, создаётся wrapper, который "видит" 
+эту переменную count через ссылку, и wrapper возвращается, заменяя greet.
+
+Дальше каждый вызов greet(...) на самом деле — это вызов того самого wrapper, который был создан на шаге 2. 
+Сам wrapper вызывается много раз, но переменная count живёт не внутри wrapper, а в "ячейке" (cell), 
+которая была создана при выполнении decorator — и она создаётся ровно один раз, при обёртывании функции, а не при каждом вызове.
+
+======================================================================================================
+
+① limit_calls(number_of_calls) — единственная задача: принять аргумент декоратора (3, в твоём примере) и "запомнить" его,
+чтобы он был доступен дальше по цепочке. Как только эта функция возвращает decorator, сама limit_calls как вызов уже отработала — 
+но number_of_calls не исчезает, потому что decorator замыкает его на себя 
+(та же механика closure, что с count, просто один уровень выше).
+
+
+② decorator(func) — здесь number_of_calls уже доступен (замкнут из limit_calls), и теперь нужно "запомнить" ещё и саму 
+функцию func, которую оборачиваем, плюс завести счётчик count.
+
+③ wrapper(...) — здесь доступны оба замкнутых значения: number_of_calls (из уровня ①) и count/func (из уровня ②). 
+Именно wrapper реально выполняется при каждом вызове greet(...).
+'''
+
+
+def limit_calls(number_of_calls):
+   def decorator(func):
+       count = 0
+
+       @functools.wraps(func)
+       def wrapper(*args, **kwargs):
+           # переменная count внутри этой функции — не новая локальная, а та самая,
+           # что определена в объемлющей (enclosing) функции снаружи"
+           nonlocal count
+           count += 1
+
+           if count > number_of_calls:
+               raise RuntimeError(
+                   f"'{func.__name__}' can only be called {number_of_calls} times, "
+                   f"but was called {count} times"
+               )
+
+           return func(*args, **kwargs)
+       return wrapper
+   return decorator
+
+
+@limit_calls(3)
+def greet(name):
+    print(f"Hello, {name}")
+    return name
+
+
+greet("Alice")
+greet("Den")
+greet("Megan")
+
+
+print('=================================')
+
+
+
 
 
 # Декоратор                                    Что делает
+
 # @functools.lru_cache(maxsize=128)           Кеширует результаты по аргументам.
 #                                             Аргументы должны быть хешируемыми
 

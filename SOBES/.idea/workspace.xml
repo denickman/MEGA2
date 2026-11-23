@@ -5,61 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/.idea/Makedon-MicorServices.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/app/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/app/consumer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/app/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/app/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/analytic-service/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/api/router.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/api/routers/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/api/routers/catalog.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/api/routers/orders.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/api_client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/app/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/api-gateway/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/app/security.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/auth-service/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/infra/docker-compose.analytic.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/infra/docker-compose.core.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Makedon-MicorServices/infra/nginx/nginx.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/CORS" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Complexity" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/GARBAGE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/GIL" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/JWT " afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/MULTIPROCESSING" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/SQLAlchemy vc Pydantic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/__call__" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/__eq__hash__" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PDFs/БД мои конспекты.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/MRO.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/REPEATA.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/REPEATA2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/duck_typing.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/mixin.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/7 Layers LOGIN" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/BROKERS/RabbitMQ-Kafka" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/DOCS/Виды JOIN в SQL.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/Docker - проброс" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/DockerFile-Enhance" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/FastAPI-Django-Flask" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/ORM_pros_cons" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/OSI-TCP-IP" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/TOKENS TYPES" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/БД - where-having-groupBy" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/БД-BASE-NoSQL" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/БД-Репликация" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/БД-Шардирование" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/монолит-микросервис" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LIVE CODING 1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/custom_context_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/generator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/generics.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/protocol.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Misc/Event Loop + Async" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/Event Loop + Async" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/dataclass.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/dataclass+pydantic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/deco+mixin.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/deco+mixin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MAKEDON/Makedon_06_ctx_mng.py" beforeDir="false" afterPath="$PROJECT_DIR$/MAKEDON/Makedon_06_context_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/http" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/n+1" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/n+1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/БД - Индексы" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/БД - Индексы" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/БД-ACID" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/БД-ACID" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/decorator.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/decorator.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +66,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.LIVE CODING 1.executor": "Run",
     "Python.MRO.executor": "Run",
     "Python.Makedon_01.executor": "Run",
     "Python.Makedon_02.executor": "Run",
@@ -107,10 +79,12 @@
     "Python.a=1.executor": "Run",
     "Python.closures.executor": "Run",
     "Python.coroutine.executor": "Run",
+    "Python.custom_context_manager.executor": "Run",
     "Python.deco+mixin.executor": "Run",
     "Python.deco.executor": "Run",
     "Python.decorator.executor": "Run",
     "Python.garbage_collector.executor": "Run",
+    "Python.generator.executor": "Run",
     "Python.m4_main.executor": "Run",
     "Python.main.executor": "Run",
     "Python.python_core.executor": "Run",
@@ -121,7 +95,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/denisyaremenko/Desktop/DEV/PYTHON 2/MEGA/SOBES/PDFs",
+    "last_opened_file_path": "/Users/denisyaremenko/Desktop/DEV/PYTHON 2/MEGA/SOBES/Misc/DOCS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -132,14 +106,15 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Misc/DOCS" />
       <recent name="$PROJECT_DIR$/PDFs" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING" />
       <recent name="$PROJECT_DIR$/MAKEDON/app/api/routers" />
       <recent name="$PROJECT_DIR$/MAKEDON" />
       <recent name="$PROJECT_DIR$/PYTHON_CORE" />
       <recent name="$PROJECT_DIR$/Misc" />
-      <recent name="$PROJECT_DIR$/SQLAlchemy" />
     </key>
   </component>
   <component name="SharedIndexes">

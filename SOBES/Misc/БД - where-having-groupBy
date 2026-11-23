@@ -1,0 +1,72 @@
+WHERE — фильтрация строк ДО группировки
+
+Отбирает строки по условию, работает с обычными колонками, построчно.
+
+sql
+SELECT *
+FROM orders
+WHERE amount > 100;
+
+Применяется до любой агрегации — база сначала отфильтровывает строки, и только потом (если есть) считает что-то агрегатное.
+
+GROUP BY — группировка строк + агрегатные функции
+
+Объединяет строки с одинаковым значением в указанной колонке в группы, и к каждой группе можно применить агрегатную функцию
+ (COUNT, SUM, AVG, MAX, MIN).
+
+sql
+SELECT user_id, SUM(amount) AS total
+FROM orders
+GROUP BY user_id;
+
+Пример на твоих данных:
+
+orders: user_id=1, amount=100
+        user_id=1, amount=200
+        user_id=2, amount=50
+
+Результат:
+
+user_id | total
+1       | 300    <- 100+200 склеились в одну группу
+2       | 50
+
+Без GROUP BY агрегатная функция считает по всей таблице сразу (одно число на весь результат), а с GROUP BY —
+по одному числу на каждую группу.
+
+HAVING — фильтрация ПОСЛЕ группировки
+
+Тут частая путаница: WHERE не может фильтровать по результату агрегатной функции (SUM, COUNT), потому что на
+момент WHERE группировка ещё не произошла. Для этого есть HAVING:
+
+sql
+SELECT user_id, SUM(amount) AS total
+FROM orders
+GROUP BY user_id
+HAVING SUM(amount) > 100;  -- оставит только user_id=1 (300 > 100)
+Порядок выполнения (важно для понимания)
+
+SQL выполняется не в том порядке, в котором написан:
+
+FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+FROM — берём таблицу
+WHERE — фильтруем строки (ещё поштучно, группировки нет)
+GROUP BY — склеиваем в группы
+HAVING — фильтруем уже готовые группы
+SELECT — выбираем, что показать
+ORDER BY — сортируем результат
+
+Поэтому WHERE — только по "сырым" колонкам, HAVING — только после того, как группы и агрегаты уже посчитаны.
+
+Связка с SQLAlchemy (ORM)
+python
+from sqlalchemy import func
+
+session.query(Order.user_id, func.sum(Order.amount).label("total")) \
+    .filter(Order.amount > 100) \                    # WHERE
+    .group_by(Order.user_id) \                        # GROUP BY
+    .having(func.sum(Order.amount) > 100) \           # HAVING
+    .all()
+
+.filter() → WHERE, .group_by() → GROUP BY, .having() → HAVING — именно в таком порядке логика и выполняется,
+даже если в коде вызовы идут по-другому.

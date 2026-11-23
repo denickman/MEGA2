@@ -52,8 +52,129 @@ for user in users:
 
 
 
-
 Суть одной фразой
 
 Проблема не в самом коде user.orders — а в том, что он скрыто превращается в отдельный поход к БД на каждой итерации
 цикла, если не попросить ORM загрузить связанные данные заранее одним запросом.
+
+
+============================================================================================================
+
+
+Помимо joinedload, в SQLAlchemy есть ещё несколько стратегий загрузки связанных данных:
+
+1. selectinload — чаще всего рекомендуемая альтернатива для коллекций (one-to-many, many-to-many)
+
+python
+from sqlalchemy.orm import selectinload
+
+users = session.query(User).options(selectinload(User.orders)).all()
+
+Делает 2 запроса: один за users, второй — SELECT * FROM orders WHERE user_id IN (...) со списком всех id.
+В отличие от joinedload, не раздувает результат через JOIN (при joinedload на коллекции строки users
+дублируются по числу связанных orders — это может быть тяжелее на больших выборках). selectinload обычно
+быстрее и предпочтительнее именно для списков/коллекций.
+
+2. subqueryload — похож на selectinload, но использует подзапрос вместо IN (...) со списком id. Сейчас
+используется реже — selectinload в большинстве случаев эффективнее и более предсказуем.
+
+3. contains_eager — когда JOIN ты уже написал сам вручную, а ORM просто нужно сказать "используй результат
+этого join для заполнения связи", а не делать отдельный запрос:
+
+python
+from sqlalchemy.orm import contains_eager
+
+users = (
+    session.query(User)
+    .join(User.orders)
+    .options(contains_eager(User.orders))
+    .all()
+)
+
+4. raiseload — не решает N+1, а помогает его обнаружить на этапе разработки: запрещает ленивую подгрузку
+и кидает исключение при попытке обратиться к незагрученной связи. Полезно ставить в тестах/дев-окружении,
+чтобы такие баги не доживали до прода:
+
+python
+from sqlalchemy.orm import raiseload
+users = session.query(User).options(raiseload(User.orders)).all()
+
+Когда что выбирать:
+
+joinedload — для to-one связей (ForeignKey в сторону родителя), где дублирования строк не будет
+selectinload — для to-many связей (коллекции) — почти всегда лучший выбор по умолчанию
+contains_eager — когда JOIN и так нужен для фильтрации/сортировки, и ты не хочешь делать его дважды
+raiseload — не для продакшена, а как страховка в разработке/тестах, чтобы ловить N+1 раньше
+
+
+
+
+
+
+
+===========================================
+
+у тебя в примере User.orders — это one-to-many (один-ко-многим): один пользователь может иметь много заказов.
+
+Разберём на модели, чтобы стало видно, где FK и в какую сторону:
+
+python
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    orders = relationship("Order", back_populates="user")  # one-to-many (коллекция!)
+
+
+class Order(Base):
+    __tablename__ = "orders"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))  # <-- FK лежит здесь
+    amount = Column(Integer)
+
+    user = relationship("User", back_populates="orders")  # many-to-one (один объект!)
+
+Ключевое правило: смотри, где физически лежит foreign key в таблице.
+
+В таблице orders есть колонка user_id → это значит, что FK смотрит от Order к User
+Значит, со стороны Order.user — это to-one (у одного заказа ровно один пользователь, можно сразу получить по FK)
+А со стороны User.orders — это to-many (у одного пользователя может быть коллекция заказов — список, а не одно значение)
+
+Почему это важно для выбора стратегии:
+
+Твой пример:
+
+python
+users = session.query(User).options(selectinload(User.orders)).all()
+
+Здесь User.orders — коллекция (to-many) → selectinload правильный выбор. SQLAlchemy сделает:
+
+sql
+SELECT * FROM users;
+SELECT * FROM orders WHERE user_id IN (1, 2, 3, ...);  -- один доп. запрос на ВСЕ orders сразу
+
+Если бы ты шёл в обратную сторону — от заказа к пользователю:
+
+python
+orders = session.query(Order).options(joinedload(Order.user)).all()
+
+Здесь Order.user — одиночный объект (to-one) → joinedload лучше, потому что JOIN не размножит строки
+(у каждого Order ровно один User, дублирования не будет):
+
+sql
+SELECT orders.*, users.* FROM orders JOIN users ON orders.user_id = users.id;
+
+Почему joinedload плохо подходит для to-many: если бы ты сделал joinedload(User.orders) (твой пример,
+где orders — коллекция), SQL превратился бы в:
+
+sql
+SELECT users.*, orders.* FROM users JOIN orders ON orders.user_id = users.id;
+
+Если у user#1 пять заказов — строка с user#1 в результате JOIN продублируется 5 раз (по разу на каждый order).
+SQLAlchemy потом сам "склеивает" эти дубли обратно в один User с коллекцией из 5 orders, но сам результат
+SQL-запроса может быть раздутым (представь 1 пользователя с 10 000 заказов — это 10 000 строк из БД только
+чтобы собрать одного юзера). Поэтому для коллекций selectinload почти всегда эффективнее — он не плодит дубли,
+а делает чистый второй запрос WHERE user_id IN (...).
+
+
