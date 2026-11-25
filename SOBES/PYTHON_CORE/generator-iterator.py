@@ -1,9 +1,10 @@
 
 
 '''
-
-
 Итератор vs Генератор — это НЕ одно и то же, генератор — частный случай итератора
+
+list сам по себе не умеет "запоминать позицию" и отдавать элементы по одному — а итератор умеет.
+Поэтому iter() оборачивает список в такой объект.
 
 Итератор (Iterator) — любой объект, у которого есть метод __next__() (и __iter__(), возвращающий самого себя). Это общий протокол.
 
@@ -35,6 +36,63 @@ class MyIterator:
         self.index += 1
         return value
 
+
+
+
+
+
+Итератор — это объект, который умеет отдавать элементы по одному, через next().
+Когда элементы кончаются — выбрасывает StopIteration.
+
+numbers = [1, 2, 3]
+it = iter(numbers)  # получили итератор
+
+print(next(it))  # 1
+print(next(it))  # 2
+print(next(it))  # 3
+print(next(it))  # StopIteration (ошибка — элементы кончились)
+
+
+Чтобы сделать свой итератор, нужен класс с методами __iter__ и __next__:
+
+class Counter:
+    def __init__(self, limit):
+        self.limit = limit
+        self.current = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current >= self.limit:
+            raise StopIteration
+        self.current += 1
+        return self.current
+
+for num in Counter(3):
+    print(num)  # 1 2 3
+
+
+
+Генератор — это упрощённый способ создать итератор, но вместо класса пишешь обычную функцию с ключевым словом yield.
+
+def counter(limit):
+current = 1
+while current <= limit:
+    yield current
+    current += 1
+
+for num in counter(3):
+    print(num)  # 1 2 3
+
+
+Главный плюс — экономия памяти. Генератор не хранит все значения сразу, а выдаёт их по требованию ("лениво").
+
+# Плохо для больших чисел — весь список сразу в памяти
+squares_list = [x**2 for x in range(1_000_000)]
+
+# Хорошо — ничего не хранится, значения считаются по одному
+squares_gen = (x**2 for x in range(1_000_000))
 
 
 '''

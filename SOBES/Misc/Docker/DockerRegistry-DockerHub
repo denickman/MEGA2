@@ -1,0 +1,54 @@
+Docker Registry vs Docker Hub
+
+Тут важно понять: это не два конкурирующих продукта, а общее понятие и его конкретная реализация.
+
+Docker Registry — это общее понятие (технология)
+
+Registry — это просто сервер (программа), который хранит и раздаёт Docker-образы по сети,
+с поддержкой тегов, пушей (docker push) и пуллов (docker pull). Это как "склад для образов"
+в общем смысле — протокол/API, по которому Docker-клиент умеет общаться с любым хранилищем образов.
+
+Можно запустить свой собственный приватный registry, вот прямо локально:
+
+docker run -d -p 5000:5000 --name registry registry:2
+
+# теперь можно пушить образы в СВОЙ registry:
+docker tag my-app:v1.0 localhost:5000/my-app:v1.0
+docker push localhost:5000/my-app:v1.0
+
+
+
+
+
+
+
+Docker Hub — это конкретный, публичный registry от компании Docker
+
+Docker Hub (hub.docker.com) — это самый известный, публичный, облачный registry,
+который держит сама компания Docker. Это "дефолтный склад", куда Docker по умолчанию ходит, если ты явно не указал другой адрес.
+
+docker pull nginx
+# на самом деле это сокращение от:
+docker pull docker.io/library/nginx
+# docker.io — это как раз адрес Docker Hub
+
+
+
+
+Registry  — это как "сайт на основе WordPress" (общий движок/технология)
+Docker Hub — это как "конкретный, самый популярный сайт на WordPress" (WordPress.com)
+
+
+# Если тег НЕ содержит адрес сервера — Docker считает, что это Docker Hub:
+docker push my-app:v1.0
+# это эквивалент docker push docker.io/library/my-app:v1.0
+
+# Если хочешь запушить в ДРУГОЙ registry — указываешь его адрес прямо в теге:
+docker tag my-app:v1.0 ghcr.io/denickman/my-app:v1.0
+docker push ghcr.io/denickman/my-app:v1.0
+
+docker tag my-app:v1.0 123456789.dkr.ecr.eu-west-1.amazonaws.com/my-app:v1.0
+docker push 123456789.dkr.ecr.eu-west-1.amazonaws.com/my-app:v1.0
+
+
+

@@ -205,6 +205,12 @@ with ProcessPoolExecutor(max_workers=4) as executor:
 
 
 
+У меня задача грузит CPU (вычисления)?
+├── Да  → multiprocessing (свой GIL у каждого процесса → реальный параллелизм на ядрах)
+└── Нет → задача ждёт (сеть/диск/БД)?
+    ├── Код async/await-совместимый (aiohttp и т.п.) → asyncio (дешевле всего)
+    └── Код обычный синхронный (requests и т.п.)     → threading (GIL не мешает в момент ожидания)
+
 
 
 

@@ -83,7 +83,32 @@ with FileOpener('data.txt', 'r') as file:
 
 
 
+from contextlib import contextmanager
 
+class Connection:
+    def __init__(self, name: str):
+        self.name = name
+        self.is_open = False
+
+
+@contextmanager
+def connection(name: str):
+    conn = Connection(name)
+
+    # аналог __enter__ (до yield)
+    conn.is_open = True
+    print(f"[OPEN] {conn.name}")
+
+    yield conn  # то, что попадёт в "as connection"
+
+    # аналог __exit__ (после yield)
+    conn.is_open = False
+    print(f"[CLOSE] {conn.name}")
+
+
+# Использование
+with connection("db") as conn:
+    print("Работаем внутри блока:", conn.is_open)
 
 
 

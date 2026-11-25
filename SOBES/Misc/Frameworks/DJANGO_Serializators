@@ -1,0 +1,147 @@
+Сериализаторы — это часть Django REST Framework (DRF), а не самого "чистого" Django
+(в обычном Django их нет, это надстройка для создания API). Разберём, зачем они и как работают.
+
+Зачем они нужны
+
+Проблема: у тебя есть Python-объект (например, объект модели User из базы данных), а клиенту
+(фронтенду, мобильному приложению) нужно отправить это в виде JSON. И наоборот — клиент присылает JSON,
+а тебе нужно превратить его в Python-объект и сохранить в базу, попутно всё провалидировав.
+
+Сериализатор решает именно эту задачу — "перевод" в обе стороны:
+
+Объект Python (модель из БД)  --сериализация-->  JSON (для клиента)
+JSON (от клиента)  --десериализация + валидация-->  Объект Python / запись в БД
+Простой пример
+python
+from rest_framework import serializers
+from .models import Book
+
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ["id", "title", "author", "price"]
+
+Это говорит: "возьми модель Book, и для полей id, title, author, price сам сгенерируй логику перевода в JSON и обратно".
+
+Сериализация (объект → JSON)
+python
+book = Book.objects.get(id=1)
+serializer = BookSerializer(book)
+
+print(serializer.data)
+# {'id': 1, 'title': 'Мастер и Маргарита', 'author': 'Булгаков', 'price': '350.00'}
+
+serializer.data — это уже обычный Python-словарь, который DRF потом сам превращает в настоящий JSON-текст,
+когда отправляет ответ клиенту (через Response(serializer.data) во вьюхе).
+
+Десериализация (JSON → объект) + валидация
+python
+# допустим, пришли такие данные от клиента (например, из request.data)
+incoming_data = {"title": "1984", "author": "Оруэлл", "price": "250.00"}
+
+serializer = BookSerializer(data=incoming_data)
+
+if serializer.is_valid():
+    book = serializer.save()   # создаёт и сохраняет Book в базу данных
+    print("Сохранено:", book.title)
+else:
+    print("Ошибки:", serializer.errors)
+
+Ключевые шаги:
+
+serializer = BookSerializer(data=incoming_data) — создаём сериализатор с "сырыми" данными.
+.is_valid() — обязательно вызывается перед доступом к данным. Проверяет типы, обязательные поля, кастомные
+правила валидации. Если что-то не так — заполняет .errors и возвращает False.
+.save() — только если валидация прошла, сохраняет объект в базу (вызывает create() или update() внутри).
+Как работает валидация — можно добавлять свои правила
+python
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ["id", "title", "author", "price"]
+
+    def validate_price(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Цена должна быть положительной")
+        return value
+
+    def validate(self, data):
+        # общая валидация, когда нужно сверить НЕСКОЛЬКО полей между собой
+        if data["title"] == data["author"]:
+            raise serializers.ValidationError("Название и автор не могут совпадать")
+        return data
+validate_<имя_поля> — проверка одного конкретного поля.
+validate(self, data) — проверка, когда нужно сравнить несколько полей друг с другом.
+create() и update() — можно переопределить свою логику
+
+По умолчанию ModelSerializer сам умеет создавать и обновлять объект, но если логика сложнее (например,
+нужно создать связанные объекты) — переопределяешь:
+
+python
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ["id", "title", "author", "price"]
+
+    def create(self, validated_data):
+        book = Book.objects.create(**validated_data)
+        # например, тут же можно отправить сигнал или создать связанную запись
+        return book
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get("title", instance.title)
+        instance.price = validated_data.get("price", instance.price)
+        instance.save()
+        return instance
+Вложенные сериализаторы (для связанных моделей)
+python
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ["id", "name"]
+
+class BookSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer()   # вложенный сериализатор вместо просто ID
+
+    class Meta:
+        model = Book
+        fields = ["id", "title", "author", "price"]
+
+Теперь вместо "author": 5 в JSON придёт целый вложенный объект: "author": {"id": 5, "name": "Оруэлл"}.
+
+read_only / write_only поля
+python
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)   # приходит от клиента, но никогда не отдаётся обратно
+    date_joined = serializers.DateTimeField(read_only=True)  # отдаётся клиенту, но нельзя передать при создании
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "password", "date_joined"]
+Как это выглядит целиком во вьюхе (типичный путь)
+python
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(["GET", "POST"])
+def book_list(request):
+    if request.method == "GET":
+        books = Book.objects.all()
+        serializer = BookSerializer(books, many=True)  # many=True — список объектов
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = BookSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+many=True — важный момент: по умолчанию сериализатор рассчитан на один объект, а для списка (queryset из
+нескольких записей) нужно явно это указать.
+
+Итог — короткая аналогия
+
+Сериализатор — это как "переводчик" между двумя мирами: миром Python-объектов (модели Django) и миром JSON
+(то, что ходит по сети). Заодно он берёт на себя валидацию — то есть не только переводит, но и проверяет,
+что данные корректны, прежде чем что-то сохранить в базу.
