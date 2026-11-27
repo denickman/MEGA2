@@ -5,20 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Misc/DB/БД-Outbox" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/DB/БД-Saga Pattern" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/DB/БД-ПартРеплШард" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Pytho/Callable" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Pytho/SOLID" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Pytho/TypeVar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc/Pytho/descriptor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding 2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Misc/Brokers/ГарантииДоставкиСМС" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/Brokers/ГарантииДоставкиСМС" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Misc/DB/БД-ACID" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/DB/БД-ACID" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Misc/DB/БД-тразнакции" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/DB/БД-тразнакции" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Misc/Pytho/__eq__hash__" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/Pytho/__eq__hash__" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/dataclass+pydantic.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/dataclass+pydantic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/Async/GIL" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/Async/GIL" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LIVE CODING 1.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding 2.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding 2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/Threads.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/Threads.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
