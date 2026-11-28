@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68992181-970c-4734-a031-d56d17766e0a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Misc/Async/ThreadingVSAsyncio" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/Pytho/lru_cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Misc/Pytho/профилирование" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding3.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Misc/Async/GIL" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/Async/GIL" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LIVE CODING 1.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding 2.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/LIVE CODING/LiveCoding 2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PYTHON_CORE/Threads.py" beforeDir="false" afterPath="$PROJECT_DIR$/PYTHON_CORE/Threads.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/DB/БД+Запросы" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/DB/БД+Запросы" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc/Network/http" beforeDir="false" afterPath="$PROJECT_DIR$/Misc/Network/http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +48,7 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.LIVE CODING 1.executor": "Run",
+    "Python.LiveCoding3.executor": "Run",
     "Python.MRO.executor": "Run",
     "Python.Makedon_01.executor": "Run",
     "Python.Makedon_02.executor": "Run",
